@@ -31,9 +31,9 @@ def startDownload(email, password):
 
   s = requests.Session()
   r = s.get("https://m.tuenti.com/?m=Login")
-  csrf = re.findall('name="csrf" value="(.*?)"', r.text)
+  csrf = re.findall('name="csrf" value="(.*?)"', r.text)[0]
   
-  data = { "csrf": csrf[0], "tuentiemailaddress": email, "password": password, "remember": 1 }
+  data = { "csrf": csrf, "tuentiemailaddress": email, "password": password, "remember": 1 }
   s.post("https://m.tuenti.com/?m=Login&f=process_login", data)
   
   r = s.get("https://m.tuenti.com/?m=Profile&func=my_profile")
