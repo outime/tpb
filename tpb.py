@@ -43,7 +43,7 @@ def startDownload(email, password):
   firstPic = "https://m.tuenti.com/?m=Photos&func=view_album_photo&collection_key=1-" + re.findall('key=1-(.*?)&', r.text)[0]
 
   r = s.get(firstPic)
-  picQuantity = int(re.findall('of\s(\d+)\)', r.text)[0])
+  picQuantity = int(re.findall('[of|de|\/|sur|di|van|z]\s(\d+)\)', r.text)[0])
   photoDownloadUrl = re.findall('img\ssrc="(.*?)"', r.text)[0]
   nextPhotoUrl = re.findall('\)\s\<a href="(.*?)"', r.text)[0].replace("&amp;", "&") # not loading a whole lib for one single entity
 
