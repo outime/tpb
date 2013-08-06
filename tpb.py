@@ -49,7 +49,7 @@ def startDownload(email, password):
 
   for x in range(1, picQuantity):
     if x != 1:
-      r = s.get(nextPhotoUrl)
+      r = s.get(nextPhotoUrl, cookies={"screen": "1920-1080-1920-1040-1-20.74"})
       photoDownloadUrl = re.findall('img\ssrc="(.*?)"', r.text)[0]
       nextPhotoUrl = re.findall('\)\s\<a href="(.*?)"', r.text)[0].replace("&amp;", "&")
 
@@ -69,7 +69,7 @@ def startDownload(email, password):
 
 
 if __name__ == "__main__":
-  version = "1.0"
+  version = "1.0.2"
   print "-" * 11
   print "| tpb " + version + " |"
   print "-" * 11
