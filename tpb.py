@@ -8,6 +8,7 @@
 ################################################
 
 import re, getpass, requests, os
+from time import sleep
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -64,12 +65,13 @@ def startDownload(email, password):
 
     percent = (x*100) / picQuantity
     print str(x) + ".jpg downloaded (" + str(percent) + "%) ..."
+    sleep(0.5) # avoid flooding
 
   print "Done."
 
 
 if __name__ == "__main__":
-  version = "1.0.2"
+  version = "1.0.3"
   print "-" * 11
   print "| tpb " + version + " |"
   print "-" * 11
