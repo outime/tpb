@@ -1,5 +1,4 @@
-##tuentiphotobackup (tpb)
-
+##tpb
 It is a simple Python2 script that downloads all the stored photos from Tuenti, a popular Spanish social network. This one replaces the old PHP [tuentiphotobackup](https://github.com/outime/tuentiphotobackup) script.
 
 ###Required modules
