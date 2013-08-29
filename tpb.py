@@ -28,7 +28,7 @@ def init():
 
 
 def startDownload(email, password):
-  print "Logging in as " + email + "..."
+  print "Logging in as %s..." % email
 
   s = requests.Session()
   r = s.get("https://m.tuenti.com/?m=Login")
@@ -64,14 +64,14 @@ def startDownload(email, password):
         handle.write(block)
 
     percent = (x*100) / picQuantity
-    print str(x) + ".jpg downloaded (" + str(percent) + "%) ..."
+    print "%s.jpg downloaded (%d%%)..." % (x, percent)
     sleep(0.5) # avoid flooding
 
   print "Done."
 
 
 if __name__ == "__main__":
-  version = "1.0.3"
+  version = "1.0.4"
   print "-" * 11
   print "| tpb " + version + " |"
   print "-" * 11
