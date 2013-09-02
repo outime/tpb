@@ -1,11 +1,11 @@
 #!/usr/bin/python
 #coding=UTF-8
 
-################################################
-# tuentiphotobackup (tpb)                      #
-# https://github.com/outime/tpb/               #
-# Ruben Diaz <outime@gmail.com>                #
-################################################
+##################################
+# tuentiphotobackup (tpb)        #
+# https://github.com/outime/tpb/ #
+# Ruben Diaz <outime@gmail.com>  #
+##################################
 
 import re, getpass, requests, os
 from time import sleep
@@ -75,8 +75,6 @@ def startDownload(email, password):
 
 
 if __name__ == "__main__":
-  version = "1.0.4"
-  print "-" * 11
-  print "| tpb " + version + " |"
-  print "-" * 11
+  version = 1.1
+  print "~ tpb %s ~" % version
   init()
