@@ -2,7 +2,9 @@
 It is a simple Python2 script that downloads all the stored photos from Tuenti, a popular Spanish social network. This one replaces the old PHP [tuentiphotobackup](https://github.com/outime/tuentiphotobackup) script.
 
 ###Required modules
-Only [Requests](http://docs.python-requests.org/) module is required. Installing it with [pip](http://en.wikipedia.org/wiki/Pip_(package_manager\)) is the recommended/easiest way to do it: $ pip install requests
+Only [Requests](http://docs.python-requests.org/) module is required. Installing it with [pip](http://en.wikipedia.org/wiki/Pip_(package_manager\)) is the recommended/easiest way to do it: 
+
+	$ pip install requests
 
 ###How to use
 Execute 'tpb.py' script with no arguments as it will interactively ask you for the login details. Just after that, it will automatically fetch all your photos under the 'tagged' album and store them under your local 'photos' directory (which will be created if it does not yet exist).
