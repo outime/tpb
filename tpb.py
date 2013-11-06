@@ -50,13 +50,17 @@ def startDownload(email, password):
     r = s.get(firstPic)
     picQuantity = int(re.findall('[of|de|\/|sur|di|van|z]\s(\d+)\)', r.text)[0])
     photoDownloadUrl = re.findall('img\ssrc="(.*?)"', r.text)[0]
-    nextPhotoUrl = re.findall('\)\s\<a href="(.*?)"', r.text)[0].replace("&amp;", "&") # not loading a whole lib for one single entity
+    if picQuantity > 1:
+      nextPhotoUrl = re.findall('\)\s\<a href="(.*?)"', r.text)[0].replace("&amp;", "&") # not loading a whole lib for one single entity
+    else:
+      nextPhotoUrl = None
 
-    for x in range(1, picQuantity):
+    for x in range(1, picQuantity + 1):
       if x != 1:
         r = s.get(nextPhotoUrl, cookies={"screen": "1920-1080-1920-1040-1-20.74"})
         photoDownloadUrl = re.findall('img\ssrc="(.*?)"', r.text)[0]
-        nextPhotoUrl = re.findall('\)\s\<a href="(.*?)"', r.text)[0].replace("&amp;", "&")
+        if x != picQuantity:
+          nextPhotoUrl = re.findall('\)\s\<a href="(.*?)"', r.text)[0].replace("&amp;", "&")
 
       with open(path + "/"+ dirs[i-1]+ "/" + str(x) + ".jpg", "wb") as handle:
         r = s.get(photoDownloadUrl)
