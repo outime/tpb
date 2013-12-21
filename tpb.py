@@ -25,6 +25,9 @@ def init():
     email = raw_input("Wrong e-mail, please try again: ")
 
   password = getpass.getpass()
+  
+  while not password:
+    password = getpass.getpass()
 
   startDownload(email, password)
 
@@ -37,11 +40,15 @@ def startDownload(email, password):
   csrf = re.findall('name="csrf" value="(.*?)"', r.text)[0]
 
   data = { "csrf": csrf, "tuentiemailaddress": email, "password": password, "remember": 1 }
-  s.post("https://m.tuenti.com/?m=Login&f=process_login", data)
+  r = s.post("https://m.tuenti.com/?m=Login&f=process_login", data)
+
+  if 'tuentiemail' in r.cookies:
+    print "Wrong login :("
+    init()
   
   for i in range(1,3):
     r = s.get("https://m.tuenti.com/?m=Profile&func=my_profile")
-    print "Downloading " + dirs[i-1] + " photos"
+    print "Downloading " + dirs[i-1] + " photos..."
     album = "https://m.tuenti.com/?m=Albums&func=index&collection_key=%i-" % i + re.findall('key=%i-(.*?)&' % i, r.text)[0]
 
     r = s.get(album)
@@ -72,13 +79,15 @@ def startDownload(email, password):
           handle.write(block)
 
       percent = (x*100) / picQuantity
-      print "%s.jpg downloaded (%i%%)... (%i/2)" % (x, percent, i)
+      print "%s.jpg downloaded (%i%%)... (album %i/2)" % (x, percent, i)
       sleep(0.5) # avoid flooding
 
-    print "Done."
+    print "Done!"
 
 
 if __name__ == "__main__":
-  version = 1.1
-  print "~ tpb %s ~" % version
-  init()
+  print "~ tpb ~"
+  try:
+    init()
+  except KeyboardInterrupt:
+    pass
