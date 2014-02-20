@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#coding=UTF-8
+# coding=UTF-8
 
 ##################################
 # tuentiphotobackup (tpb)        #
@@ -7,87 +7,107 @@
 # Ruben Diaz <outime@gmail.com>  #
 ##################################
 
-import re, getpass, requests, os
+import re
+import getpass
+import requests
+import os
 from time import sleep
 
-path = os.path.dirname(os.path.abspath(__file__))
+PATH = os.path.dirname(os.path.abspath(__file__))
+BASEURI = "https://m.tuenti.com/"
 dirs = ['tagged', 'uploaded']
 
+
 def init():
-  for dir in dirs:
-    if not os.path.exists(path + '/' + dir):
-      os.makedirs(path + '/' + dir)
-      print "Created %s directory" % dir
-  
-  email = raw_input('E-mail: ')
+    for dir in dirs:
+        if not os.path.exists(PATH + '/' + dir):
+            os.makedirs(PATH + '/' + dir)
+            print "Created %s directory" % dir
 
-  while( not re.match(r"[^@]+@[^@]+\.[^@]+", email) ):
-    email = raw_input("Wrong e-mail, please try again: ")
+    email = raw_input('E-mail: ')
 
-  password = getpass.getpass()
-  
-  while not password:
+    while(not re.match(r"[^@]+@[^@]+\.[^@]+", email)):
+        email = raw_input("Wrong e-mail, please try again: ")
+
     password = getpass.getpass()
 
-  startDownload(email, password)
+    while not password:
+        password = getpass.getpass()
+
+    startDownload(email, password)
 
 
 def startDownload(email, password):
-  print "Logging in as %s..." % email
-  
-  s = requests.Session()
-  r = s.get("https://m.tuenti.com/?m=Login")
-  csrf = re.findall('name="csrf" value="(.*?)"', r.text)[0]
+    s = requests.Session()
 
-  data = { "csrf": csrf, "tuentiemailaddress": email, "password": password, "remember": 1 }
-  r = s.post("https://m.tuenti.com/?m=Login&f=process_login", data)
+    print "Logging in as %s..." % email
+    r = s.get(BASEURI + "?m=Login")
+    csrf = re.findall('name="csrf" value="(.*?)"', r.text)[0]
+    data = {
+        "csrf": csrf,
+        "tuentiemailaddress": email,
+        "password": password,
+        "remember": 1}
+    r = s.post(BASEURI + "?m=Login&f=process_login", data)
 
-  if 'tuentiemail' in r.cookies:
-    print "Wrong login :("
-    init()
-  
-  for i in range(1,3):
-    r = s.get("https://m.tuenti.com/?m=Profile&func=my_profile")
-    print "Downloading " + dirs[i-1] + " photos..."
-    album = "https://m.tuenti.com/?m=Albums&func=index&collection_key=%i-" % i + re.findall('key=%i-(.*?)&' % i, r.text)[0]
+    if 'tuentiemail' in r.cookies:
+        print "Wrong login :("
+        init()
 
-    r = s.get(album)
-    firstPic = "https://m.tuenti.com/?m=Photos&func=view_album_photo&collection_key=%i-" % i + re.findall('key=%i-(.*?)&' % i, r.text)[0]
+    for i in range(1, 3):
+        r = s.get(BASEURI + "?m=Profile&func=my_profile")
+        print "Downloading " + dirs[i - 1] + " photos..."
+        album = BASEURI + "?m=Albums&func=index&collection_key=%i-" % i + \
+            re.findall('key=%i-(.*?)&' % i, r.text)[0]
 
-    r = s.get(firstPic)
-    picQuantity = int(re.findall('[of|de|\/|sur|di|van|z]\s(\d+)\)', r.text)[0])
-    photoDownloadUrl = re.findall('img\ssrc="(.*?)"', r.text)[0]
-    if picQuantity > 1:
-      nextPhotoUrl = re.findall('\)\s\<a href="(.*?)"', r.text)[0].replace("&amp;", "&") # not loading a whole lib for one single entity
-    else:
-      nextPhotoUrl = None
+        r = s.get(album)
+        firstPic = BASEURI + "?m=Photos&func=view_album_photo&collection_key=%i-" % i + \
+            re.findall('key=%i-(.*?)&' % i, r.text)[0]
 
-    for x in range(1, picQuantity + 1):
-      if x != 1:
-        r = s.get(nextPhotoUrl, cookies={"screen": "1920-1080-1920-1040-1-20.74"})
+        r = s.get(firstPic)
+        picQuantity = int(
+            re.findall('[of|de|\/|sur|di|van|z]\s(\d+)\)',
+                       r.text)[0])
         photoDownloadUrl = re.findall('img\ssrc="(.*?)"', r.text)[0]
-        if x != picQuantity:
-          nextPhotoUrl = re.findall('\)\s\<a href="(.*?)"', r.text)[0].replace("&amp;", "&")
+        if picQuantity > 1:
+            nextPhotoUrl = re.findall(
+                '\)\s\<a href="(.*?)"',
+                r.text)[0].replace("&amp;",
+                                   "&")  # not loading a whole lib for one single entity
+        else:
+            nextPhotoUrl = None
 
-      with open(path + "/"+ dirs[i-1]+ "/" + str(x) + ".jpg", "wb") as handle:
-        r = s.get(photoDownloadUrl)
+        for x in range(1, picQuantity + 1):
+            if x != 1:
+                r = s.get(
+                    nextPhotoUrl,
+                    cookies={"screen": "1920-1080-1920-1040-1-20.74"})
+                photoDownloadUrl = re.findall('img\ssrc="(.*?)"', r.text)[0]
+                if x != picQuantity:
+                    nextPhotoUrl = re.findall(
+                        '\)\s\<a href="(.*?)"',
+                        r.text)[0].replace("&amp;",
+                                           "&")
 
-        for block in r.iter_content(1024):
-          if not block:
-            break
+            with open(PATH + "/" + dirs[i - 1] + "/" + str(x) + ".jpg", "wb") as handle:
+                r = s.get(photoDownloadUrl)
 
-          handle.write(block)
+                for block in r.iter_content(1024):
+                    if not block:
+                        break
 
-      percent = (x*100) / picQuantity
-      print "%s.jpg downloaded (%i%%)... (album %i/2)" % (x, percent, i)
-      sleep(0.5) # avoid flooding
+                    handle.write(block)
 
-    print "Done!"
+            percent = (x * 100) / picQuantity
+            print "%s.jpg downloaded (%i%%)... (album %i/2)" % (x, percent, i)
+            sleep(0.5)  # avoid flooding
+
+        print "Done!"
 
 
 if __name__ == "__main__":
-  print "~ tpb ~"
-  try:
-    init()
-  except KeyboardInterrupt:
-    pass
+    print "~ tpb ~"
+    try:
+        init()
+    except KeyboardInterrupt:
+        pass
